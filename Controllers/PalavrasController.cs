@@ -18,13 +18,17 @@ namespace MimicAPI.Controllers
             _banco = banco;
         }
         
-        //APP -- /api/palavras
+        //APP -- /api/palavras?data=2020-04-14
         [Route("")]
         [HttpGet]
-        public ActionResult ObterTodas()
+        public ActionResult ObterTodas(DateTime? data)//A data será para armazenar no app, para depois o aplicativo atualizar as palavras novas. 
         {
-
-            return Ok(_banco.Palavras);
+            var item = _banco.Palavras.AsQueryable();
+            if (data.HasValue)
+            {
+                item = item.Where(a => a.Criado > data.Value || a.Atulizado > data.Value);
+            }
+            return Ok(item);
             //return new JsonResult(_banco.Palavras);
         }
 
