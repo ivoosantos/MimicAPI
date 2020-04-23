@@ -15,7 +15,8 @@ namespace MimicAPI.V1.Controllers
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [ApiVersion("1.0")]
+    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion("1.1")]
     public class PalavrasController : ControllerBase
     {
         private readonly IPalavraRepository _repository;
@@ -26,6 +27,8 @@ namespace MimicAPI.V1.Controllers
             _mapper = mapper;
         }
         
+        [MapToApiVersion("1.0")]
+        [MapToApiVersion("1.1")]
         //APP -- /api/palavras?data=2020-04-14
         //[Route("")]
         [HttpGet("", Name = "ObterTodas")]
@@ -93,6 +96,8 @@ namespace MimicAPI.V1.Controllers
             return Ok(palavraDTO);
         }
 
+        [MapToApiVersion("1.0")]
+        [MapToApiVersion("1.1")]
         // -- /api/palavras(POST: id, nome, ativo, pontuacao, criacao)
         [Route("")]
         [HttpPost]
@@ -116,6 +121,9 @@ namespace MimicAPI.V1.Controllers
             return Created($"/api/palavras/{palavra.Id}", palavraDTO);//Created() -> quando dá certo e retorna o objeto direcionando a uma URL
         }
 
+
+        [MapToApiVersion("1.0")]
+        [MapToApiVersion("1.1")]
         // -- /api/palavras(POST: id, nome, ativo, pontuacao, criacao)
         //[Route("{id}")]
         [HttpPut("{id}", Name = "AtualizarPalavra")]
@@ -145,6 +153,7 @@ namespace MimicAPI.V1.Controllers
             return Ok();
         }
 
+        [MapToApiVersion("1.1")]
         // -- /api/palavras/1 (DELETE)
         //[Route("{id}")]
         [HttpDelete("{id}", Name = "DeletarPalavra")]
