@@ -30,14 +30,22 @@ namespace MimicAPI.Controllers
         public ActionResult ObterTodas([FromQuery]PalavraUrlQuery query)//A data será para armazenar no app, para depois o aplicativo atualizar as palavras novas. 
         {
             var item = _repository.ObterPalavras(query);
-            if (query.PagNumero > item.Paginacao.TotalPaginas)
-            {
+            
+            if (item.Count == 0)
                 return NotFound();
+
+            if(item.Paginacao != null)
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Paginacao));
+
+            var lista = _mapper.Map<PaginationList<Palavra>, PaginationList<PalavraDTO>>(item);
+
+            foreach(var palavra in lista)
+            {
+                palavra.Links = new List<LinkDTO>();
+                palavra.Links.Add(new LinkDTO("self", Url.Link("ObterPalavra", new { id = palavra.Id }), "GET"));
             }
 
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Paginacao));
-
-            return Ok(item.ToList());
+            return Ok(lista);
             //return new JsonResult(_banco.Palavras);
         }
 
