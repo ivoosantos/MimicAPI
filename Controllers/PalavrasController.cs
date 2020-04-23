@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using MimicAPI.Models.DTO;
 
 namespace MimicAPI.Controllers
 {
@@ -15,9 +17,11 @@ namespace MimicAPI.Controllers
     public class PalavrasController : ControllerBase
     {
         private readonly IPalavraRepository _repository;
-        public PalavrasController(IPalavraRepository repository)
+        private readonly IMapper _mapper;
+        public PalavrasController(IPalavraRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
         
         //APP -- /api/palavras?data=2020-04-14
@@ -47,7 +51,11 @@ namespace MimicAPI.Controllers
             if (obj == null)
                 return NotFound();
 
-            return Ok(obj);
+            PalavraDTO palavraDTO = _mapper.Map<Palavra, PalavraDTO>(obj);
+            palavraDTO.Links = new List<LinkDTO>();
+            palavraDTO.Links.Add(new LinkDTO("self", $"https://localhost:44396/api/palavras/{palavraDTO.Id}", "GET"));
+
+            return Ok(palavraDTO);
         }
 
         // -- /api/palavras(POST: id, nome, ativo, pontuacao, criacao)
