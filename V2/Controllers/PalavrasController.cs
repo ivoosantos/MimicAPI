@@ -9,7 +9,8 @@ namespace MimicAPI.V2.Controllers
     // /api/V2.0/palavras
 
     [ApiController]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    //[Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/[controller]")]
     [ApiVersion("2.0")]
     public class PalavrasController : ControllerBase
     {
