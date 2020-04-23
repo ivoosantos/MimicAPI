@@ -30,16 +30,20 @@ namespace MimicAPI.Controllers
         public ActionResult ObterTodas([FromQuery]PalavraUrlQuery query)//A data será para armazenar no app, para depois o aplicativo atualizar as palavras novas. 
         {
             var item = _repository.ObterPalavras(query);
-            
+
             if (item.Results.Count == 0)
                 return NotFound();
+            PaginationList<PalavraDTO> lista = CriarLinksListPalavraDTO(query, item);
 
-            if(item.Paginacao != null)
-                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Paginacao));
+            return Ok(lista);
+            //return new JsonResult(_banco.Palavras);
+        }
 
+        private PaginationList<PalavraDTO> CriarLinksListPalavraDTO(PalavraUrlQuery query, PaginationList<Palavra> item)
+        {
             var lista = _mapper.Map<PaginationList<Palavra>, PaginationList<PalavraDTO>>(item);
 
-            foreach(var palavra in lista.Results)
+            foreach (var palavra in lista.Results)
             {
                 palavra.Links = new List<LinkDTO>();
                 palavra.Links.Add(new LinkDTO("self", Url.Link("ObterPalavra", new { id = palavra.Id }), "GET"));
@@ -47,8 +51,25 @@ namespace MimicAPI.Controllers
 
             lista.Links.Add(new LinkDTO("self", Url.Link("ObterTodas", query), "GET"));
 
-            return Ok(lista);
-            //return new JsonResult(_banco.Palavras);
+            if (item.Paginacao != null)
+            {
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Paginacao));
+
+                if (query.PagNumero + 1 <= item.Paginacao.TotalPaginas)
+                {
+                    var queryString = new PalavraUrlQuery() { PagNumero = query.PagNumero + 1, PagRegistro = query.PagRegistro, Data = query.Data };
+                    lista.Links.Add(new LinkDTO("next", Url.Link("ObterTodas", queryString), "GET"));
+                }
+                if (query.PagNumero - 1 > 0)
+                {
+                    var queryString = new PalavraUrlQuery() { PagNumero = query.PagNumero - 1, PagRegistro = query.PagRegistro, Data = query.Data };
+                    lista.Links.Add(new LinkDTO("prev", Url.Link("ObterTodas", queryString), "GET"));
+                }
+
+
+            }
+
+            return lista;
         }
 
         //WEB -- /api/palavras/1
