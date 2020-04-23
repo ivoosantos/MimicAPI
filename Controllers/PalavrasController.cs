@@ -25,13 +25,13 @@ namespace MimicAPI.Controllers
         }
         
         //APP -- /api/palavras?data=2020-04-14
-        [Route("")]
-        [HttpGet]
+        //[Route("")]
+        [HttpGet("", Name = "ObterTodas")]
         public ActionResult ObterTodas([FromQuery]PalavraUrlQuery query)//A data será para armazenar no app, para depois o aplicativo atualizar as palavras novas. 
         {
             var item = _repository.ObterPalavras(query);
             
-            if (item.Count == 0)
+            if (item.Results.Count == 0)
                 return NotFound();
 
             if(item.Paginacao != null)
@@ -39,11 +39,13 @@ namespace MimicAPI.Controllers
 
             var lista = _mapper.Map<PaginationList<Palavra>, PaginationList<PalavraDTO>>(item);
 
-            foreach(var palavra in lista)
+            foreach(var palavra in lista.Results)
             {
                 palavra.Links = new List<LinkDTO>();
                 palavra.Links.Add(new LinkDTO("self", Url.Link("ObterPalavra", new { id = palavra.Id }), "GET"));
             }
+
+            lista.Links.Add(new LinkDTO("self", Url.Link("ObterTodas", query), "GET"));
 
             return Ok(lista);
             //return new JsonResult(_banco.Palavras);
