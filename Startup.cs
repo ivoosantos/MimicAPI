@@ -40,7 +40,7 @@ namespace MimicAPI
             services.AddApiVersioning(cfg =>
             {
                 cfg.ReportApiVersions = true;
-                cfg.ApiVersionReader = new HeaderApiVersionReader("api-version");
+                //cfg.ApiVersionReader = new HeaderApiVersionReader("api-version");
                 cfg.AssumeDefaultVersionWhenUnspecified = true;
                 cfg.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
             });
